@@ -2,6 +2,70 @@ var MMDParser = require('mmd-parser');
 
 window.onload = function(){
 
+var parser = new MMDParser.Parser();
+
+var position = [];
+var normal = [];
+var uv = [];
+
+  function load (url, responseType, mimeType, onLoad, onProgress, onError) {
+    var request = new XMLHttpRequest();
+    request.open('GET', url, true);
+    request.addEventListener('load', function (event) {
+      var response = event.target.response;
+      if (this.status === 200) {
+        onLoad(response);
+      } else if (this.status === 0) {
+        console.warn('HTTP Status 0 received.');
+        onLoad(response);
+      } else {
+        console.warn('HTTP Status ' + this.status + ' received.');
+        onError(event);
+      }
+    }, false);
+    if (onProgress !== undefined) request.addEventListener('progress', onProgress, false);
+    if (onError !== undefined) request.addEventListener('error', onError, false);
+    request.responseType = responseType;
+    if (mimeType !== undefined) request.overrideMimeType(mimeType)
+    request.send(null);
+    console.log('downloading: ' + url);
+  }
+
+  function testPmd () {
+    console.log('PMD parse test');
+    load(
+      'http://localhost:8081/natumiku.pmx',
+      'arraybuffer',
+      undefined,
+      function (buffer) {
+        var pmd = parser.parsePmx(buffer);
+        console.log(pmd);
+
+        const vertices=pmd["vertices"];
+        const verticesCount = vertices.length
+        for (var i = verticesCount - 1; i >= 0; i--) {
+          position.push(vertices[i]["position"][0]);
+          position.push(vertices[i]["position"][1]);
+          position.push(vertices[i]["position"][2]);
+          normal.push(vertices[i]["normal"][0]);
+          normal.push(vertices[i]["normal"][1]);
+          normal.push(vertices[i]["normal"][2]);
+          uv.push(vertices[i]["uv"][0]);
+          uv.push(vertices[i]["uv"][1]);
+        }
+        console.log(position);
+        console.log(normal);
+        console.log(uv);
+      }
+    );
+  }
+
+  testPmd();
+
+
+
+
+
 
 
 var gl; // WebGL的全局变量
@@ -56,7 +120,7 @@ function changeVertices() {
   // gl.drawArrays(gl.TRIANGLE_STRIP, 0, n);
   gl.drawElements(gl.TRIANGLES, 30, gl.UNSIGNED_BYTE, 0);
 }
-changeVertices()
+// changeVertices()
 
 
 // resize the canvas to fill browser window dynamically
