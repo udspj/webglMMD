@@ -80,6 +80,7 @@ var faces = [];
 
         gl.clearColor(0.0, 0.0, 0.0, 1.0);
         gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
+  gl.enable(gl.DEPTH_TEST);
 
         var u_ModelMatrix = gl.getUniformLocation(gl.program,"u_ModelMatrix");
         var modelMatrix = new Matrix4();
@@ -87,7 +88,7 @@ var faces = [];
         var u_ViewMatrix = gl.getUniformLocation(gl.program,"u_ViewMatrix");
         var viewMatrix = new Matrix4();
         // viewMatrix.setLookAt(0.20, 0.25, 0.25, 0,0,0, 0,1,0);
-        viewMatrix.setLookAt(0,0,80,0,0,0,0,1,0);
+        viewMatrix.setLookAt(0,0,-50,0,7,0,0,1,0);
         gl.uniformMatrix4fv(u_ViewMatrix,false,viewMatrix.elements);
 
         var u_ProjMatrix = gl.getUniformLocation(gl.program,"u_ProjMatrix");
