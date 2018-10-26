@@ -7,6 +7,8 @@ var parser = new MMDParser.Parser();
 var position = [];
 var normal = [];
 var uv = [];
+var materials = [];
+var faces = [];
 
   function load (url, responseType, mimeType, onLoad, onProgress, onError) {
     var request = new XMLHttpRequest();
@@ -40,10 +42,11 @@ var uv = [];
       function (buffer) {
         var pmd = parser.parsePmx(buffer);
         console.log(pmd);
+        console.log(pmd.metadata)
 
-        const vertices=pmd["vertices"];
+        const vertices = pmd["vertices"];
         const verticesCount = vertices.length
-        for (var i = verticesCount - 1; i >= 0; i--) {
+        for (var i = 0; i < verticesCount ; i++) {
           position.push(vertices[i]["position"][0]);
           position.push(vertices[i]["position"][1]);
           position.push(vertices[i]["position"][2]);
@@ -53,9 +56,14 @@ var uv = [];
           uv.push(vertices[i]["uv"][0]);
           uv.push(vertices[i]["uv"][1]);
         }
-        console.log(position);
-        console.log(normal);
-        console.log(uv);
+        materials = pmd["materials"];
+        // faces = pmd["faces"];
+        const faceCount = faces.length;
+        for (var i = 0 ; i < verticesCount; i++) {
+          faces.push(pmd["faces"][i]["indices"][0]);
+          faces.push(pmd["faces"][i]["indices"][1]);
+          faces.push(pmd["faces"][i]["indices"][2]);
+        }
 
 
         var gl; // WebGL的全局变量
@@ -70,13 +78,16 @@ var uv = [];
           alert('shaders error');
         }
 
+        gl.clearColor(0.0, 0.0, 0.0, 1.0);
+        gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
+
         var u_ModelMatrix = gl.getUniformLocation(gl.program,"u_ModelMatrix");
         var modelMatrix = new Matrix4();
 
         var u_ViewMatrix = gl.getUniformLocation(gl.program,"u_ViewMatrix");
         var viewMatrix = new Matrix4();
         // viewMatrix.setLookAt(0.20, 0.25, 0.25, 0,0,0, 0,1,0);
-        viewMatrix.setLookAt(0,0,5,0,0,0,0,1,0);
+        viewMatrix.setLookAt(0,0,80,0,0,0,0,1,0);
         gl.uniformMatrix4fv(u_ViewMatrix,false,viewMatrix.elements);
 
         var u_ProjMatrix = gl.getUniformLocation(gl.program,"u_ProjMatrix");
@@ -92,16 +103,11 @@ var uv = [];
         var u_ViewMatrix = gl.getUniformLocation(gl.program,"u_ViewMatrix");
         var g_texUnit0 = false;
 
-
-
-
         var image0 = new Image();
         image0.onload = function() {
           initVertexBuffers(gl,image0);
         }
         image0.src = require('./resource/kabe.jpg')//'/static/kabe.jpg';
-
-
 
       }
     );
@@ -112,48 +118,68 @@ testPmd();
 
 
 function initVertexBuffers(gl,image0) {
+        // console.log(position);
+        // console.log(normal);
+        // console.log(uv);
+        // console.log(materials);
 
   var vertexColorbuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, vertexColorbuffer);
-  gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(position), gl.STATIC_DRAW);
   var a_Position = gl.getAttribLocation(gl.program, 'a_Position');
   gl.vertexAttribPointer(a_Position, 3, gl.FLOAT, false, 0, 0);
   gl.enableVertexAttribArray(a_Position);
 
 
-  var indexBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
-  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
+  // var normalBuffer = gl.createBuffer();
+  // gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
+  // gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(normal), gl.STATIC_DRAW);
+  // var a_Normal = gl.getAttribLocation(gl.program, 'a_Normal');
+  // gl.vertexAttribPointer(a_Normal, 3, gl.FLOAT, false, 0, 0);
+  // gl.enableVertexAttribArray(a_Normal);
 
-  var a_FSIZE = TexCoords.BYTES_PER_ELEMENT;
+
+  var a_FSIZE = uv.BYTES_PER_ELEMENT;
 
   var vertexTexCoordBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, vertexTexCoordBuffer);
-  gl.bufferData(gl.ARRAY_BUFFER, TexCoords, gl.STATIC_DRAW);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(uv), gl.STATIC_DRAW);
 
   var a_TexCoord = gl.getAttribLocation(gl.program, 'a_TexCoord');
-  gl.vertexAttribPointer(a_TexCoord, 2, gl.FLOAT, false, a_FSIZE * 2, 0);
+  gl.vertexAttribPointer(a_TexCoord, 2, gl.FLOAT, false, 0, 0);
   gl.enableVertexAttribArray(a_TexCoord);
+
+
 
     var texture0 = gl.createTexture();
     var u_Sampler0 = gl.getUniformLocation(gl.program, 'u_Sampler0');
 
-    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
-    // if (texUnit == 0) {
-      gl.activeTexture(gl.TEXTURE0);
-      g_texUnit0 = true;
-    // }
-    gl.bindTexture(gl.TEXTURE_2D, texture0);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image0);
-    gl.uniform1i(u_Sampler0, 0);
+    const materialsCount = materials.length;
+    var offset = 0;
+    for (var i = 0; i < materialsCount; i++) {
+          const count = materials[i]["faceCount"] * 3
 
-    if (g_texUnit0) {
-      gl.clearColor(0.0, 0.0, 0.0, 1.0);
-      gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
-        // gl.drawArrays(gl.TRIANGLE_STRIP, 0, n);
-      gl.drawElements(gl.TRIANGLES, 30, gl.UNSIGNED_BYTE, 0);
+          var indexes = faces.slice(offset,offset+count)
+          // console.log(indexes)
+        offset += count;
+        
+      var indexBuffer = gl.createBuffer();
+      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+      gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indexes), gl.STATIC_DRAW);
+
+        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, texture0);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image0);
+        gl.uniform1i(u_Sampler0, 0);
+
+
+          
+            // gl.drawArrays(gl.TRIANGLE_STRIP, 0, n);
+          gl.drawElements(gl.TRIANGLES, indexes.length, gl.UNSIGNED_SHORT, 0);
     }
+
 
 }
 
