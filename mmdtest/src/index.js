@@ -94,9 +94,17 @@ var g_texUnit0 = false;
 
 
 
-var n = initVertexBuffers(gl);
 
-initTextures(gl, n);
+var image0 = new Image();
+  image0.onload = function() {
+
+
+    initVertexBuffers(gl,image0);
+
+
+
+  }
+  image0.src = require('./resource/kabe.jpg')//'/static/kabe.jpg';
 
 
 
@@ -166,7 +174,7 @@ initTextures(gl, n);
 
 
 
-function initVertexBuffers(gl) {
+function initVertexBuffers(gl,image0) {
 
   var vertexColorbuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, vertexColorbuffer);
@@ -190,7 +198,29 @@ function initVertexBuffers(gl) {
   gl.vertexAttribPointer(a_TexCoord, 2, gl.FLOAT, false, a_FSIZE * 2, 0);
   gl.enableVertexAttribArray(a_TexCoord);
 
-  return 20;
+    var texture0 = gl.createTexture();
+    var u_Sampler0 = gl.getUniformLocation(gl.program, 'u_Sampler0');
+
+    // loadTexture(gl, n, texture0, u_Sampler0, image0, 0);
+    // function loadTexture(gl, n, texture, u_Sampler, image, texUnit) {
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
+    // if (texUnit == 0) {
+      gl.activeTexture(gl.TEXTURE0);
+      g_texUnit0 = true;
+    // }
+    gl.bindTexture(gl.TEXTURE_2D, texture0);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image0);
+    gl.uniform1i(u_Sampler0, 0);
+
+    if (g_texUnit0) {
+      gl.clearColor(0.0, 0.0, 0.0, 1.0);
+      gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
+        // gl.drawArrays(gl.TRIANGLE_STRIP, 0, n);
+      gl.drawElements(gl.TRIANGLES, 30, gl.UNSIGNED_BYTE, 0);
+    }
+
+
 }
 
 // function initArrayBuffer (gl, attribute, data, num, type) {
@@ -225,10 +255,11 @@ function initVertexBuffers(gl) {
 
 
 function initTextures(gl, n) {
-  var texture0 = gl.createTexture();
-  var u_Sampler0 = gl.getUniformLocation(gl.program, 'u_Sampler0');
   var image0 = new Image();
   image0.onload = function() {
+    initVertexBuffers(gl);
+    var texture0 = gl.createTexture();
+    var u_Sampler0 = gl.getUniformLocation(gl.program, 'u_Sampler0');
     loadTexture(gl, n, texture0, u_Sampler0, image0, 0);
   }
   image0.src = require('./resource/kabe.jpg')//'/static/kabe.jpg';
