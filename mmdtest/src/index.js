@@ -56,19 +56,9 @@ var uv = [];
         console.log(position);
         console.log(normal);
         console.log(uv);
-      }
-    );
-  }
-
-  testPmd();
 
 
-
-
-
-
-
-var gl; // WebGL的全局变量
+        var gl; // WebGL的全局变量
 
 var canvas = document.getElementById("glcanvas");
 gl = initWebGL(canvas);   
@@ -80,62 +70,8 @@ if (!initShaders(gl, VSHADER_SOURCE, FSHADER_SOURCE)) {
   alert('shaders error');
 }
 
-var n = initVertexBuffers(gl);
-
-initTextures(gl, n);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 var u_ModelMatrix = gl.getUniformLocation(gl.program,"u_ModelMatrix");
 var modelMatrix = new Matrix4();
-
-function changeVertices() {
-  var scale = 0.7*window.innerHeight*2/window.innerWidth/0.5
-  if(window.innerWidth < window.innerHeight) {
-    scale = 0.9*window.innerWidth/2/window.innerHeight/0.5
-    modelMatrix.setScale(0.9/0.5,scale,1);
-  }else{
-    modelMatrix.setScale(scale,0.7/0.5,1);
-  }
-
-  gl.uniformMatrix4fv(u_ModelMatrix,false,modelMatrix.elements);
-
-  gl.clearColor(0.0, 0.0, 0.0, 1.0);
-  gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
-  // gl.drawArrays(gl.TRIANGLE_STRIP, 0, n);
-  gl.drawElements(gl.TRIANGLES, 30, gl.UNSIGNED_BYTE, 0);
-}
-// changeVertices()
-
-
-// resize the canvas to fill browser window dynamically
-window.addEventListener('resize', resizeCanvas, false);
-function resizeCanvas() {
-  canvas.style.width = window.innerWidth + "px"; 
-  canvas.style.height = window.innerHeight + "px";
-
-  changeVertices()
-}
-resizeCanvas();
-
-
-
-
 
 var u_ViewMatrix = gl.getUniformLocation(gl.program,"u_ViewMatrix");
 var viewMatrix = new Matrix4();
@@ -150,6 +86,84 @@ projMatrix.setPerspective(30, 1, 1, 100);
 gl.uniformMatrix4fv(u_ProjMatrix,false,projMatrix.elements);
 
 gl.uniformMatrix4fv(u_ModelMatrix,false,modelMatrix.elements);
+
+
+var viewMatrix = new Matrix4();
+var u_ViewMatrix = gl.getUniformLocation(gl.program,"u_ViewMatrix");
+var g_texUnit0 = false;
+
+
+
+var n = initVertexBuffers(gl);
+
+initTextures(gl, n);
+
+
+
+      }
+    );
+  }
+
+  testPmd();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// function changeVertices() {
+//   var scale = 0.7*window.innerHeight*2/window.innerWidth/0.5
+//   if(window.innerWidth < window.innerHeight) {
+//     scale = 0.9*window.innerWidth/2/window.innerHeight/0.5
+//     modelMatrix.setScale(0.9/0.5,scale,1);
+//   }else{
+//     modelMatrix.setScale(scale,0.7/0.5,1);
+//   }
+
+//   gl.uniformMatrix4fv(u_ModelMatrix,false,modelMatrix.elements);
+
+//   gl.clearColor(0.0, 0.0, 0.0, 1.0);
+//   gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
+//   // gl.drawArrays(gl.TRIANGLE_STRIP, 0, n);
+//   gl.drawElements(gl.TRIANGLES, 30, gl.UNSIGNED_BYTE, 0);
+// }
+// // changeVertices()
+
+
+// // resize the canvas to fill browser window dynamically
+// window.addEventListener('resize', resizeCanvas, false);
+// function resizeCanvas() {
+//   canvas.style.width = window.innerWidth + "px"; 
+//   canvas.style.height = window.innerHeight + "px";
+
+//   changeVertices()
+// }
+// resizeCanvas();
+
+
+
+
+
 
 
 function initVertexBuffers(gl) {
@@ -179,42 +193,36 @@ function initVertexBuffers(gl) {
   return 20;
 }
 
-function initArrayBuffer (gl, attribute, data, num, type) {
-  // Create a buffer object
-  var buffer = gl.createBuffer();
-  if (!buffer) {
-    console.log('Failed to create the buffer object');
-    return false;
-  }
-  // Write date into the buffer object
-  gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-  gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
-  // Assign the buffer object to the attribute variable
-  var a_attribute = gl.getAttribLocation(gl.program, attribute);
-  if (a_attribute < 0) {
-    console.log('Failed to get the storage location of ' + attribute);
-    return false;
-  }
-  gl.vertexAttribPointer(a_attribute, num, type, false, 0, 0);
-  // Enable the assignment of the buffer object to the attribute variable
-  gl.enableVertexAttribArray(a_attribute);
+// function initArrayBuffer (gl, attribute, data, num, type) {
+//   // Create a buffer object
+//   var buffer = gl.createBuffer();
+//   if (!buffer) {
+//     console.log('Failed to create the buffer object');
+//     return false;
+//   }
+//   // Write date into the buffer object
+//   gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+//   gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
+//   // Assign the buffer object to the attribute variable
+//   var a_attribute = gl.getAttribLocation(gl.program, attribute);
+//   if (a_attribute < 0) {
+//     console.log('Failed to get the storage location of ' + attribute);
+//     return false;
+//   }
+//   gl.vertexAttribPointer(a_attribute, num, type, false, 0, 0);
+//   // Enable the assignment of the buffer object to the attribute variable
+//   gl.enableVertexAttribArray(a_attribute);
 
-  gl.bindBuffer(gl.ARRAY_BUFFER, null);
+//   gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
-  return true;
-}
-
-
+//   return true;
+// }
 
 
 
 
 
 
-
-var viewMatrix = new Matrix4();
-var u_ViewMatrix = gl.getUniformLocation(gl.program,"u_ViewMatrix");
-var g_texUnit0 = false;
 
 function initTextures(gl, n) {
   var texture0 = gl.createTexture();
