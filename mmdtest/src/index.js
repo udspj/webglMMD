@@ -60,51 +60,46 @@ var uv = [];
 
         var gl; // WebGL的全局变量
 
-var canvas = document.getElementById("glcanvas");
-gl = initWebGL(canvas);   
-if (!gl) {
-  alert('gl error');
-}
+        var canvas = document.getElementById("glcanvas");
+        gl = initWebGL(canvas);   
+        if (!gl) {
+          alert('gl error');
+        }
 
-if (!initShaders(gl, VSHADER_SOURCE, FSHADER_SOURCE)) {
-  alert('shaders error');
-}
+        if (!initShaders(gl, VSHADER_SOURCE, FSHADER_SOURCE)) {
+          alert('shaders error');
+        }
 
-var u_ModelMatrix = gl.getUniformLocation(gl.program,"u_ModelMatrix");
-var modelMatrix = new Matrix4();
+        var u_ModelMatrix = gl.getUniformLocation(gl.program,"u_ModelMatrix");
+        var modelMatrix = new Matrix4();
 
-var u_ViewMatrix = gl.getUniformLocation(gl.program,"u_ViewMatrix");
-var viewMatrix = new Matrix4();
-// viewMatrix.setLookAt(0.20, 0.25, 0.25, 0,0,0, 0,1,0);
-viewMatrix.setLookAt(0,0,5,0,0,0,0,1,0);
-gl.uniformMatrix4fv(u_ViewMatrix,false,viewMatrix.elements);
+        var u_ViewMatrix = gl.getUniformLocation(gl.program,"u_ViewMatrix");
+        var viewMatrix = new Matrix4();
+        // viewMatrix.setLookAt(0.20, 0.25, 0.25, 0,0,0, 0,1,0);
+        viewMatrix.setLookAt(0,0,5,0,0,0,0,1,0);
+        gl.uniformMatrix4fv(u_ViewMatrix,false,viewMatrix.elements);
 
-var u_ProjMatrix = gl.getUniformLocation(gl.program,"u_ProjMatrix");
-var projMatrix = new Matrix4();
-// modelMatrix.setOrtho(-5,5,-5,5,-5,5);
-projMatrix.setPerspective(30, 1, 1, 100);
-gl.uniformMatrix4fv(u_ProjMatrix,false,projMatrix.elements);
+        var u_ProjMatrix = gl.getUniformLocation(gl.program,"u_ProjMatrix");
+        var projMatrix = new Matrix4();
+        // modelMatrix.setOrtho(-5,5,-5,5,-5,5);
+        projMatrix.setPerspective(30, 1, 1, 100);
+        gl.uniformMatrix4fv(u_ProjMatrix,false,projMatrix.elements);
 
-gl.uniformMatrix4fv(u_ModelMatrix,false,modelMatrix.elements);
-
-
-var viewMatrix = new Matrix4();
-var u_ViewMatrix = gl.getUniformLocation(gl.program,"u_ViewMatrix");
-var g_texUnit0 = false;
+        gl.uniformMatrix4fv(u_ModelMatrix,false,modelMatrix.elements);
 
 
-
-
-var image0 = new Image();
-  image0.onload = function() {
-
-
-    initVertexBuffers(gl,image0);
+        var viewMatrix = new Matrix4();
+        var u_ViewMatrix = gl.getUniformLocation(gl.program,"u_ViewMatrix");
+        var g_texUnit0 = false;
 
 
 
-  }
-  image0.src = require('./resource/kabe.jpg')//'/static/kabe.jpg';
+
+        var image0 = new Image();
+        image0.onload = function() {
+          initVertexBuffers(gl,image0);
+        }
+        image0.src = require('./resource/kabe.jpg')//'/static/kabe.jpg';
 
 
 
@@ -112,66 +107,8 @@ var image0 = new Image();
     );
   }
 
-  testPmd();
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// function changeVertices() {
-//   var scale = 0.7*window.innerHeight*2/window.innerWidth/0.5
-//   if(window.innerWidth < window.innerHeight) {
-//     scale = 0.9*window.innerWidth/2/window.innerHeight/0.5
-//     modelMatrix.setScale(0.9/0.5,scale,1);
-//   }else{
-//     modelMatrix.setScale(scale,0.7/0.5,1);
-//   }
-
-//   gl.uniformMatrix4fv(u_ModelMatrix,false,modelMatrix.elements);
-
-//   gl.clearColor(0.0, 0.0, 0.0, 1.0);
-//   gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
-//   // gl.drawArrays(gl.TRIANGLE_STRIP, 0, n);
-//   gl.drawElements(gl.TRIANGLES, 30, gl.UNSIGNED_BYTE, 0);
-// }
-// // changeVertices()
-
-
-// // resize the canvas to fill browser window dynamically
-// window.addEventListener('resize', resizeCanvas, false);
-// function resizeCanvas() {
-//   canvas.style.width = window.innerWidth + "px"; 
-//   canvas.style.height = window.innerHeight + "px";
-
-//   changeVertices()
-// }
-// resizeCanvas();
-
-
-
-
-
+testPmd();
 
 
 function initVertexBuffers(gl,image0) {
@@ -201,8 +138,6 @@ function initVertexBuffers(gl,image0) {
     var texture0 = gl.createTexture();
     var u_Sampler0 = gl.getUniformLocation(gl.program, 'u_Sampler0');
 
-    // loadTexture(gl, n, texture0, u_Sampler0, image0, 0);
-    // function loadTexture(gl, n, texture, u_Sampler, image, texUnit) {
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
     // if (texUnit == 0) {
       gl.activeTexture(gl.TEXTURE0);
@@ -220,81 +155,7 @@ function initVertexBuffers(gl,image0) {
       gl.drawElements(gl.TRIANGLES, 30, gl.UNSIGNED_BYTE, 0);
     }
 
-
 }
-
-// function initArrayBuffer (gl, attribute, data, num, type) {
-//   // Create a buffer object
-//   var buffer = gl.createBuffer();
-//   if (!buffer) {
-//     console.log('Failed to create the buffer object');
-//     return false;
-//   }
-//   // Write date into the buffer object
-//   gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-//   gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
-//   // Assign the buffer object to the attribute variable
-//   var a_attribute = gl.getAttribLocation(gl.program, attribute);
-//   if (a_attribute < 0) {
-//     console.log('Failed to get the storage location of ' + attribute);
-//     return false;
-//   }
-//   gl.vertexAttribPointer(a_attribute, num, type, false, 0, 0);
-//   // Enable the assignment of the buffer object to the attribute variable
-//   gl.enableVertexAttribArray(a_attribute);
-
-//   gl.bindBuffer(gl.ARRAY_BUFFER, null);
-
-//   return true;
-// }
-
-
-
-
-
-
-
-function initTextures(gl, n) {
-  var image0 = new Image();
-  image0.onload = function() {
-    initVertexBuffers(gl);
-    var texture0 = gl.createTexture();
-    var u_Sampler0 = gl.getUniformLocation(gl.program, 'u_Sampler0');
-    loadTexture(gl, n, texture0, u_Sampler0, image0, 0);
-  }
-  image0.src = require('./resource/kabe.jpg')//'/static/kabe.jpg';
-
-  return true;
-}
-
-function loadTexture(gl, n, texture, u_Sampler, image, texUnit) {
-  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
-  if (texUnit == 0) {
-    gl.activeTexture(gl.TEXTURE0);
-    g_texUnit0 = true;
-  }
-  gl.bindTexture(gl.TEXTURE_2D, texture);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image);
-  gl.uniform1i(u_Sampler, texUnit);
-
-  if (g_texUnit0) {
-    gl.clearColor(0.0, 0.0, 0.0, 1.0);
-    gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
-      // gl.drawArrays(gl.TRIANGLE_STRIP, 0, n);
-    gl.drawElements(gl.TRIANGLES, 30, gl.UNSIGNED_BYTE, 0);
-  }
-}
-
-
-
-
-
-
-
-
-
-
 
 
 function initWebGL(canvas) {
@@ -314,14 +175,4 @@ function initWebGL(canvas) {
 
 
 
-
-
-
-
-
-
-
-
-
-	
 }
