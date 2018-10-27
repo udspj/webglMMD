@@ -39,7 +39,7 @@ var images = [];
   function testPmd () {
     console.log('PMD parse test');
     load(
-      'http://localhost:8081/yellow/miku.pmx',
+      'http://10.0.1.239:8080/yellow/miku.pmx',
       'arraybuffer',
       undefined,
       function (buffer) {
@@ -75,7 +75,8 @@ var images = [];
           image0.onload = function() {
             compindex++;
             if(compindex == txCount) {
-              initVertexBuffers();
+              initVertexBuffers("glcanvas",-50,{"a":180,"x":0,"y":0,"z":1},{"x":0,"y":-15,"z":0});
+              // initVertexBuffers("glcanvas2",50);
             }
           }
           image0.src = require('./resource/yellow/'+textures[i].replace(/\\/, "/"))//'/static/kabe.jpg';
@@ -90,12 +91,12 @@ console.log(images)
 testPmd();
 
 
-function initVertexBuffers() {
+function initVertexBuffers(canvasname,lookrotate,rotate,translate) {
 
 
         var gl; // WebGL的全局变量
 
-        var canvas = document.getElementById("glcanvas");
+        var canvas = document.getElementById(canvasname);
         gl = initWebGL(canvas);   
         if (!gl) {
           alert('gl error');
@@ -115,7 +116,7 @@ function initVertexBuffers() {
         var u_ViewMatrix = gl.getUniformLocation(gl.program,"u_ViewMatrix");
         var viewMatrix = new Matrix4();
         // viewMatrix.setLookAt(0.20, 0.25, 0.25, 0,0,0, 0,1,0);
-        viewMatrix.setLookAt(0,0,-50,0,7,0,0,1,0);
+        viewMatrix.setLookAt(0,0,lookrotate,0,7,0,0,1,0);
         gl.uniformMatrix4fv(u_ViewMatrix,false,viewMatrix.elements);
 
         var u_ProjMatrix = gl.getUniformLocation(gl.program,"u_ProjMatrix");
@@ -123,7 +124,8 @@ function initVertexBuffers() {
         // modelMatrix.setOrtho(-5,5,-5,5,-5,5);
         projMatrix.setPerspective(30, 1, 1, 100);
         gl.uniformMatrix4fv(u_ProjMatrix,false,projMatrix.elements);
-
+modelMatrix.rotate(rotate.a,rotate.x,rotate.y,rotate.z)
+modelMatrix.translate(translate.x,translate.y,translate.z)
         gl.uniformMatrix4fv(u_ModelMatrix,false,modelMatrix.elements);
 
 
@@ -186,6 +188,7 @@ function initVertexBuffers() {
 
 
 }
+
 
 
 function initWebGL(canvas) {
