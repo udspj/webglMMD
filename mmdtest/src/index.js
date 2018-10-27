@@ -75,8 +75,11 @@ var images = [];
           image0.onload = function() {
             compindex++;
             if(compindex == txCount) {
-              initVertexBuffers("glcanvas",-50,{"a":180,"x":0,"y":0,"z":1},{"x":0,"y":-15,"z":0});
-              // initVertexBuffers("glcanvas2",50);
+              // 上（正面）下（背面）左（右侧）右（左侧）
+              initVertexBuffers("glcanvas1",-50,1,{"x":0,"y":-15,"z":0});
+              initVertexBuffers("glcanvas2",50,2,{"x":0,"y":0,"z":0});
+              initVertexBuffers("glcanvas3",50,3,{"x":0,"y":-10,"z":-5});
+              initVertexBuffers("glcanvas4",50,4,{"x":0,"y":-10,"z":-5});
             }
           }
           image0.src = require('./resource/yellow/'+textures[i].replace(/\\/, "/"))//'/static/kabe.jpg';
@@ -91,7 +94,7 @@ console.log(images)
 testPmd();
 
 
-function initVertexBuffers(canvasname,lookrotate,rotate,translate) {
+function initVertexBuffers(canvasname,lookrotate,rotate_type,translate) {
 
 
         var gl; // WebGL的全局变量
@@ -124,7 +127,17 @@ function initVertexBuffers(canvasname,lookrotate,rotate,translate) {
         // modelMatrix.setOrtho(-5,5,-5,5,-5,5);
         projMatrix.setPerspective(30, 1, 1, 100);
         gl.uniformMatrix4fv(u_ProjMatrix,false,projMatrix.elements);
-modelMatrix.rotate(rotate.a,rotate.x,rotate.y,rotate.z)
+        if(rotate_type == 1) {
+          modelMatrix.rotate(180,0,0,1)
+        }else if(rotate_type == 2) {
+          modelMatrix.rotate(0,0,0,1)
+        }else if(rotate_type == 3) {
+          modelMatrix.rotate(-90,0,1,0)
+modelMatrix.rotate(90,1,0,0)
+        }else if(rotate_type == 4) {
+          modelMatrix.rotate(90,0,1,0)
+modelMatrix.rotate(90,1,0,0)
+        }
 modelMatrix.translate(translate.x,translate.y,translate.z)
         gl.uniformMatrix4fv(u_ModelMatrix,false,modelMatrix.elements);
 
@@ -206,6 +219,37 @@ function initWebGL(canvas) {
   return gl;
 }
 
+
+
+// resize the canvas to fill browser window dynamically
+window.addEventListener('resize', resizeCanvas, false);
+function resizeCanvas() {
+  var canvas1 = document.getElementById("glcanvas1");
+    canvas1.style.width = 40 + "vh"; 
+    canvas1.style.height = 40 + "vh"; 
+    canvas1.style.position = "absolute";
+    canvas1.style.left = 40+"vw";
+  var canvas2 = document.getElementById("glcanvas2");
+    canvas2.style.width = 40 + "vh"; 
+    canvas2.style.height = 40 + "vh"; 
+    canvas2.style.position = "absolute";
+    canvas2.style.left = 40+"vw";
+    canvas2.style.top = 60+"vh";
+  var canvas3 = document.getElementById("glcanvas3");
+    canvas3.style.width = 40 + "vh"; 
+    canvas3.style.height = 40 + "vh"; 
+    canvas3.style.position = "absolute";
+    canvas3.style.left = 60+"vw";
+    canvas3.style.top = 30+"vh";
+  var canvas4 = document.getElementById("glcanvas4");
+    canvas4.style.width = 40 + "vh"; 
+    canvas4.style.height = 40 + "vh"; 
+    canvas4.style.position = "absolute";
+    canvas4.style.left = 20+"vw";
+    canvas4.style.top = 30+"vh";
+    console.log("sadfsadfasd")
+}
+resizeCanvas();
 
 
 }
