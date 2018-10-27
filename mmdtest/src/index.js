@@ -39,7 +39,7 @@ var images = [];
   function testPmd () {
     console.log('PMD parse test');
     load(
-      'http://10.0.1.239:8080/yellow/miku.pmx',
+      'http://udspj.github.io/minigame/mmddemo/miku.pmx',
       'arraybuffer',
       undefined,
       function (buffer) {
@@ -82,7 +82,7 @@ var images = [];
               initVertexBuffers("glcanvas4",50,4,{"x":0,"y":-10,"z":-5});
             }
           }
-          image0.src = require('./resource/yellow/'+textures[i].replace(/\\/, "/"))//'/static/kabe.jpg';
+          image0.src = require('./resource/'+textures[i].replace(/\\/, "/"))//'/static/kabe.jpg';
             images.push(image0);
         }
 console.log(images)

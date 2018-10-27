@@ -20,7 +20,7 @@ module.exports = {
             use: [{
             loader:'url-loader',
             options:{
-                limit:8192,//限制打包图片的大小：
+                // limit:8192,//限制打包图片的大小：
                 //如果大于或等于8192Byte，则按照相应的文件名和路径打包图片；如果小于8192Byte，则将图片转成base64格式的字符串。
                 name:'images/[name]-[hash:8].[ext]',//images:图片打包的文件夹；
                 //[name].[ext]：设定图片按照本来的文件名和扩展名打包，不用进行额外编码
