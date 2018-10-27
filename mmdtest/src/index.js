@@ -247,7 +247,7 @@ function resizeCanvas() {
     canvas4.style.position = "absolute";
     canvas4.style.left = 20+"vw";
     canvas4.style.top = 30+"vh";
-    console.log("sadfsadfasd")
+    // console.log("sadfsadfasd")
 }
 resizeCanvas();
 
