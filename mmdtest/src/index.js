@@ -61,8 +61,8 @@ var images = [];
         }
         materials = pmd["materials"];
         textures = pmd["textures"];
-        const faceCount = faces.length;
-        for (var i = 0 ; i < verticesCount; i++) {
+        const faceCount = pmd["faces"].length;
+        for (var i = 0 ; i < faceCount; i++) {
           faces.push(pmd["faces"][i]["indices"][0]);
           faces.push(pmd["faces"][i]["indices"][1]);
           faces.push(pmd["faces"][i]["indices"][2]);
