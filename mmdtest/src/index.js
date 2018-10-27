@@ -44,7 +44,7 @@ var images = [];
       undefined,
       function (buffer) {
         var pmd = parser.parsePmx(buffer);
-        console.log(pmd);
+        // console.log(pmd);
         // console.log(pmd.metadata)
 
         const vertices = pmd["vertices"];
@@ -85,7 +85,7 @@ var images = [];
           image0.src = require('./resource/'+textures[i].replace(/\\/, "/"))//'/static/kabe.jpg';
             images.push(image0);
         }
-console.log(images)
+// console.log(images)
       }
     );
   }
