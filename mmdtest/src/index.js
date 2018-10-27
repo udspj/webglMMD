@@ -9,6 +9,9 @@ var normal = [];
 var uv = [];
 var materials = [];
 var faces = [];
+var textures = [];
+
+var images = [];
 
   function load (url, responseType, mimeType, onLoad, onProgress, onError) {
     var request = new XMLHttpRequest();
@@ -36,13 +39,13 @@ var faces = [];
   function testPmd () {
     console.log('PMD parse test');
     load(
-      'http://localhost:8081/natumiku.pmx',
+      'http://localhost:8081/yellow/miku.pmx',
       'arraybuffer',
       undefined,
       function (buffer) {
         var pmd = parser.parsePmx(buffer);
         console.log(pmd);
-        console.log(pmd.metadata)
+        // console.log(pmd.metadata)
 
         const vertices = pmd["vertices"];
         const verticesCount = vertices.length
@@ -57,13 +60,37 @@ var faces = [];
           uv.push(vertices[i]["uv"][1]);
         }
         materials = pmd["materials"];
-        // faces = pmd["faces"];
+        textures = pmd["textures"];
         const faceCount = faces.length;
         for (var i = 0 ; i < verticesCount; i++) {
           faces.push(pmd["faces"][i]["indices"][0]);
           faces.push(pmd["faces"][i]["indices"][1]);
           faces.push(pmd["faces"][i]["indices"][2]);
         }
+
+        const txCount = textures.length;
+        var compindex = 0;
+        for (var i = 0 ; i < txCount; i++) {
+          var image0 = new Image();
+          image0.onload = function() {
+            compindex++;
+            if(compindex == txCount) {
+              initVertexBuffers();
+            }
+          }
+          image0.src = require('./resource/yellow/'+textures[i].replace(/\\/, "/"))//'/static/kabe.jpg';
+            images.push(image0);
+        }
+console.log(images)
+      }
+    );
+  }
+
+
+testPmd();
+
+
+function initVertexBuffers() {
 
 
         var gl; // WebGL的全局变量
@@ -103,22 +130,6 @@ var faces = [];
         var viewMatrix = new Matrix4();
         var u_ViewMatrix = gl.getUniformLocation(gl.program,"u_ViewMatrix");
         var g_texUnit0 = false;
-
-        var image0 = new Image();
-        image0.onload = function() {
-          initVertexBuffers(gl,image0);
-        }
-        image0.src = require('./resource/kabe.jpg')//'/static/kabe.jpg';
-
-      }
-    );
-  }
-
-
-testPmd();
-
-
-function initVertexBuffers(gl,image0) {
         // console.log(position);
         // console.log(normal);
         // console.log(uv);
@@ -130,14 +141,6 @@ function initVertexBuffers(gl,image0) {
   var a_Position = gl.getAttribLocation(gl.program, 'a_Position');
   gl.vertexAttribPointer(a_Position, 3, gl.FLOAT, false, 0, 0);
   gl.enableVertexAttribArray(a_Position);
-
-
-  // var normalBuffer = gl.createBuffer();
-  // gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
-  // gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(normal), gl.STATIC_DRAW);
-  // var a_Normal = gl.getAttribLocation(gl.program, 'a_Normal');
-  // gl.vertexAttribPointer(a_Normal, 3, gl.FLOAT, false, 0, 0);
-  // gl.enableVertexAttribArray(a_Normal);
 
 
   var a_FSIZE = uv.BYTES_PER_ELEMENT;
@@ -172,7 +175,7 @@ function initVertexBuffers(gl,image0) {
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D, texture0);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image0);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, images[materials[i]["textureIndex"]]);
         gl.uniform1i(u_Sampler0, 0);
 
 
