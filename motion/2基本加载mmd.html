@@ -1,0 +1,80 @@
+<html>
+	<head>
+		<title>My first three.js app</title>
+		<style>
+			body { margin: 0; }
+			canvas { width: 100%; height: 100% }
+		</style>
+	</head>
+	<body>
+		<script src="js/three.min.js"></script>
+		<script src="js/js/loaders/MMDLoader.js"></script>
+		<script src="js/mmdparser.min.js"></script>
+		<script src="js/js/loaders/TGALoader.js"></script>
+		<script src="js/js/controls/OrbitControls.js"></script>
+		<script src="js/js/animation/MMDAnimationHelper.js"></script>
+		<script src="js/js/animation/CCDIKSolver.js"></script>
+		<script src="js/js/animation/MMDPhysics.js"></script>
+		<script src="js/js/libs/ammo.js"></script>
+		<script>
+			var scene = new THREE.Scene();
+			var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
+
+			var renderer = new THREE.WebGLRenderer();
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			document.body.appendChild( renderer.domElement );
+
+			var light = new THREE.DirectionalLight( 0xcccccc );
+light.position.set( 1, 1, 1 );
+scene.add( light );
+
+			camera.position.z = 20;
+			camera.position.y = 10;
+
+var helper = new THREE.MMDAnimationHelper();
+var clock = new THREE.Clock();
+
+new THREE.MMDLoader().loadWithAnimation(
+	'sega/arquivo.pmd',
+	'sega/vmds/wavefile_v2.vmd',
+	function ( mmd ) {
+
+		helper.add( mmd.mesh, {
+			animation: mmd.animation,
+			physics: true
+		} );
+
+		scene.add( mmd.mesh );
+
+		new THREE.AudioLoader().load(
+			'sega/audios/wavefile_short.mp3',
+			function ( buffer ) {
+
+				var listener = new THREE.AudioListener();
+				var audio = new THREE.Audio( listener )
+					.setBuffer( buffer );
+
+				listener.position.z = 1;
+
+				scene.add( audio );
+				scene.add( listener );
+
+				render();
+
+			}
+
+		);
+
+	}
+);
+
+function render() {
+	requestAnimationFrame( render );
+	helper.update( clock.getDelta() );
+	renderer.render( scene, camera );
+
+}
+
+		</script>
+	</body>
+</html>
