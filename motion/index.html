@@ -4,7 +4,6 @@
 		<meta charset="utf-8">
 		<style>
 			body { margin: 0; background-color: #000;}
-			#text { color: #fff; font-size: 30px;}
 		</style>
 		<script src="js/three.min.js"></script>
 		<script src="js/loaders/MMDLoader.js"></script>
@@ -19,8 +18,10 @@
 		<div id="miku2"></div>
 		<div id="miku3"></div>
 		<div id="miku4"></div>
-		<div id="text">手机横屏后点击播放</div>
-		<div id="motion1">motion1</div>
+		<button type="button" onclick="changeMotion(0)">look</button>
+		<button type="button" onclick="changeMotion(1)">sleep</button>
+		<button type="button" onclick="changeMotion(3)">up</button>
+		<button type="button" onclick="changeMotion(4)">walk</button>
 		<script>
 
 			var scene = new THREE.Scene();
@@ -66,6 +67,7 @@
 			scene.add( light );
 
 			var helper = new THREE.MMDAnimationHelper();
+									helper.configuration.resetPhysicsOnLoop = false;
 			var clock = new THREE.Clock();
 			var audioParams = { delayTime: 160 * 1 / 30 };
 
@@ -83,10 +85,16 @@
 			}
 
 			var loader = new THREE.MMDLoader();
-			var motionlist = []
-			var loadmmd = function (modelFile, vmdFiles) {
+			var audioloader = new THREE.AudioLoader();
+			var motionlist = [];
+			var voicelist = [];
+			var defaultmotionindex = 2;
+			var motionindex = defaultmotionindex;
+			var loadmmd = function (modelFile, vmdFiles, soundFiles) {
 			    loader.load(modelFile, function (mesh) {
 			        scene.add(mesh);
+			        listener.position.z = 1;
+			        scene.add( listener );
 			        // helper.add(mesh);
 
 			        if (vmdFiles && vmdFiles.length !== 0) {
@@ -106,9 +114,10 @@
 			                        loadVmd();
 			                    } else {
 									helper.add( mesh, {
-										animation: motionlist[1],
+										animation: motionlist[defaultmotionindex],
 										physics: true
 									} );
+									// helper.objects.get( mesh ).mixer.clipAction( motionlist[1] ).play();
 			                        // helper.setAnimation(mesh);
 
 			                        // mesh.mixer.stopAllAction();
@@ -123,6 +132,23 @@
 			            };
 			            loadVmd();
 			        }
+
+			        if (soundFiles && soundFiles.length !== 0) {
+			        	var voiceindex = 0;
+			        	var loadVoice = function() {
+			        		var voiceFile = soundFiles[voiceindex];
+			        		audioloader.load( voiceFile,
+								function ( buffer ) {
+									voicelist.push(buffer);
+									voiceindex++;
+				                    if (voiceindex < soundFiles.length) {
+				                        loadVoice();
+				                    }
+								}
+							)
+			        	}
+				        loadVoice();
+			        }
 			    }, onProgress, onError);
 			};
 
@@ -135,7 +161,6 @@
 			var onError = function ( xhr ) {
 			};
 
-			var motions = ["look.vmd","sleep.vmd","run.vmd","walk.vmd","up.vmd"];
 			function playMMD() {
 			    var modelFile = 'miku/arquivo.pmd';
 
@@ -147,9 +172,31 @@
 			        {name: 'walk', file: 'miku/motion/walk.vmd'},
 			    ];
 
-			    loadmmd(modelFile, vmdFiles);
+			    var soundFiles = ["miku/voice/chara1.mp3","miku/voice/chara2.mp3","miku/voice/chara3.mp3","miku/voice/chara4.mp3","miku/voice/chara5.mp3"]
+
+			    loadmmd(modelFile, vmdFiles, soundFiles);
 			}
 			playMMD();
+
+			var listener = new THREE.AudioListener();
+			var currentaudio;
+			function changeMotion(index){
+				var mesh = helper.meshes[ 0 ];
+				helper.remove( mesh );
+				helper.add( mesh, {
+					animation: motionlist[index],
+					physics: true
+				} );
+				if(currentaudio){
+					helper.remove(currentaudio)
+				}
+				var audio = new THREE.Audio( listener ).setBuffer( voicelist[index] );
+								audio.setLoop( false );
+								currentaudio=audio;
+			    helper.add( audio );
+			        scene.add( audio );
+				render();
+			}
 
 			function resizeCanvas() {
 				var miku1 = document.getElementById("miku1");
