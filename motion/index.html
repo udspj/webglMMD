@@ -190,8 +190,8 @@
 			function manageAnimation(delta){
 		        if(motionindex !== 2) {
 					motionStatus.elapsedTime += delta;
-					console.log(motionStatus.elapsedTime+","+motionStatus.duration)
-					if ( motionStatus.elapsedTime > motionStatus.duration ) {
+					// console.log(motionStatus.elapsedTime+","+motionStatus.duration)
+					if ( motionStatus.elapsedTime >= motionStatus.duration-delta ) {
 						changeMotion(2)
 					}
 				}
@@ -199,6 +199,7 @@
 
 			var listener = new THREE.AudioListener();
 			var currentaudio;
+			var audio = new THREE.Audio( listener );
 			function changeMotion(index){
 				motionindex = index;
 				var mesh = helper.meshes[ 0 ];
@@ -207,24 +208,32 @@
 					animation: motionlist[index],
 					physics: true
 				} );
+				console.log(helper.meshes)
 				if(currentaudio){
 					helper.remove(currentaudio)
 				}
 
-		        if(index !== 2) {
-				var audio = new THREE.Audio( listener ).setBuffer( voicelist[index] );
+								motionStatus.elapsedTime=0.0
+						// audio.pause()
+
+		        // if(index !== 2) {
+		        	console.log("index:"+index)
+				audio.setBuffer( voicelist[index] );
 								audio.setLoop( false );
-								currentaudio=audio;
+								// if(!currentaudio){
 			    helper.add( audio );
 		        scene.add( audio );
-		        
+								// }
+								currentaudio=audio;
+								// audio.play()
+
 					const duration = helper.objects.get( mesh ).mixer.clipAction( motionlist[index] )._clip.duration;
 					console.log("duration:"+duration)
 			        motionStatus.duration = duration;
 
-			        var delta = clock.getDelta();
-					manageAnimation( delta );
-		        }
+			  //       var delta = clock.getDelta();
+					// manageAnimation( delta );
+		        // }
 
 				render();
 			}
