@@ -77,7 +77,9 @@
 
 			function render() {
 				requestAnimationFrame( render );
-				helper.update( clock.getDelta() );
+				var delta = clock.getDelta();
+				helper.update( delta );
+				manageAnimation(delta)
 				renderer1.render( scene, camera1 );
 				renderer2.render( scene, camera2 );
 				renderer3.render( scene, camera3 );
@@ -178,9 +180,27 @@
 			}
 			playMMD();
 
+			var motionStatus = {
+				inAnimation: false,
+				elapsedTime: 0.0,
+				duration: 0.0,
+				name: '',
+				index: 0
+			};
+			function manageAnimation(delta){
+		        if(motionindex !== 2) {
+					motionStatus.elapsedTime += delta;
+					console.log(motionStatus.elapsedTime+","+motionStatus.duration)
+					if ( motionStatus.elapsedTime > motionStatus.duration ) {
+						changeMotion(2)
+					}
+				}
+			}
+
 			var listener = new THREE.AudioListener();
 			var currentaudio;
 			function changeMotion(index){
+				motionindex = index;
 				var mesh = helper.meshes[ 0 ];
 				helper.remove( mesh );
 				helper.add( mesh, {
@@ -190,11 +210,22 @@
 				if(currentaudio){
 					helper.remove(currentaudio)
 				}
+
+		        if(index !== 2) {
 				var audio = new THREE.Audio( listener ).setBuffer( voicelist[index] );
 								audio.setLoop( false );
 								currentaudio=audio;
 			    helper.add( audio );
-			        scene.add( audio );
+		        scene.add( audio );
+		        
+					const duration = helper.objects.get( mesh ).mixer.clipAction( motionlist[index] )._clip.duration;
+					console.log("duration:"+duration)
+			        motionStatus.duration = duration;
+
+			        var delta = clock.getDelta();
+					manageAnimation( delta );
+		        }
+
 				render();
 			}
 
