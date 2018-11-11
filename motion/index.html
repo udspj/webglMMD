@@ -201,13 +201,15 @@
 			var currentaudio;
 			// var audio = new THREE.Audio( listener );
 			function changeMotion(index){
-				motionindex = index;
 				var mesh = helper.meshes[ 0 ];
-				helper.remove( mesh );
-				helper.add( mesh, {
-					animation: motionlist[index],
-					physics: true
-				} );
+				// helper.remove( mesh );
+				// helper.add( mesh, {
+				// 	animation: motionlist[index],
+				// 	physics: true
+				// } );
+				helper.objects.get( mesh ).mixer.clipAction( motionlist[motionindex] ).stop();
+				helper.objects.get( mesh ).mixer.clipAction( motionlist[index] ).play();
+				motionindex = index;
 				console.log(currentaudio)
 				if(currentaudio !== undefined){
 				console.log("undefined")
