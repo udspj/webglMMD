@@ -92,6 +92,7 @@
 			var voicelist = [];
 			var defaultmotionindex = 2;
 			var motionindex = defaultmotionindex;
+			var motiondurationlist = [];
 			var loadmmd = function (modelFile, vmdFiles, soundFiles) {
 			    loader.load(modelFile, function (mesh) {
 			        scene.add(mesh);
@@ -119,6 +120,9 @@
 										animation: motionlist[defaultmotionindex],
 										physics: true
 									} );
+									for (var i = 0; i < motionlist.length; i++) {
+										motiondurationlist.push(helper.objects.get( mesh ).mixer.clipAction( motionlist[i] )._clip.duration);
+									}
 									// helper.objects.get( mesh ).mixer.clipAction( motionlist[1] ).play();
 			                        // helper.setAnimation(mesh);
 
@@ -171,7 +175,7 @@
 			        {name: 'sleep', file: 'miku/motion/sleep.vmd'},
 			        {name: 'stand', file: 'miku/motion/stand.vmd'},
 			        {name: 'up', file: 'miku/motion/up.vmd'},
-			        {name: 'walk', file: 'miku/motion/walk.vmd'},
+			        {name: 'walk', file: 'miku/motion/walk.vmd'}
 			    ];
 
 			    var soundFiles = ["miku/voice/chara1.mp3","miku/voice/chara2.mp3","miku/voice/chara3.mp3","miku/voice/chara4.mp3","miku/voice/chara5.mp3"]
@@ -220,7 +224,7 @@
 
 								motionStatus.elapsedTime=0.0
 						// audio.pause()
-
+console.log("motiondurationlist:"+motiondurationlist)
 		        if(index !== 2) {
 		        	console.log("index:"+index)
 				var audio = new THREE.Audio( listener ).setBuffer( voicelist[index] );
@@ -232,7 +236,7 @@
 								currentaudio=audio;
 								// audio.play()
 
-					const duration = helper.objects.get( mesh ).mixer.clipAction( motionlist[index] )._clip.duration;
+					const duration = motiondurationlist[index];//helper.objects.get( mesh ).mixer.clipAction( motionlist[index] )._clip.duration;
 					console.log("duration:"+duration)
 			        motionStatus.duration = duration;
 
