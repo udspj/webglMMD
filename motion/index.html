@@ -192,13 +192,13 @@
 				index: 0
 			};
 			function manageAnimation(delta){
-		        if(motionindex !== 2) {
+		        // if(motionindex !== 2) {
 					motionStatus.elapsedTime += delta;
 					// console.log(motionStatus.elapsedTime+","+motionStatus.duration)
 					if ( motionStatus.elapsedTime+delta >= motionStatus.duration-delta ) {
 						changeMotion(2)
 					}
-				}
+				// }
 			}
 
 			var listener = new THREE.AudioListener();
@@ -222,29 +222,27 @@
 					currentaudio=undefined;
 				}
 
-								motionStatus.elapsedTime=0.0
-						// audio.pause()
-console.log("motiondurationlist:"+motiondurationlist)
-		        if(index !== 2) {
-		        	console.log("index:"+index)
-				var audio = new THREE.Audio( listener ).setBuffer( voicelist[index] );
-								audio.setLoop( false );
-			    helper.add( audio );
-								// if(currentaudio !== undefined){
-		        scene.add( audio );
-								// }
-								currentaudio=audio;
-								// audio.play()
+				motionStatus.elapsedTime=0.0
+				// audio.pause()
+				console.log("motiondurationlist:"+motiondurationlist)
+				if(index !== 2) {
+					console.log("index:"+index)
+					var audio = new THREE.Audio( listener ).setBuffer( voicelist[index] );
+					audio.setLoop( false );
+					helper.add( audio );
+					// if(currentaudio !== undefined){
+					scene.add( audio );
+					// }
+					currentaudio=audio;
+					// audio.play()
+				}
 
-					const duration = motiondurationlist[index];//helper.objects.get( mesh ).mixer.clipAction( motionlist[index] )._clip.duration;
-					console.log("duration:"+duration)
-			        motionStatus.duration = duration;
+				const duration = motiondurationlist[index];//helper.objects.get( mesh ).mixer.clipAction( motionlist[index] )._clip.duration;
+				console.log("duration:"+duration)
+				motionStatus.duration = duration;
 
-			  //       var delta = clock.getDelta();
-					// manageAnimation( delta );
-		        }
-
-				//render();
+				// var delta = clock.getDelta();
+				// manageAnimation( delta );
 			}
 
 			function resizeCanvas() {
