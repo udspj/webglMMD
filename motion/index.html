@@ -329,6 +329,56 @@ recognition.onerror = function(event) {
   console.log('Error occurred in recognition: ' + event.error);
 }
 
+var jsondata = {
+	"reqType":0,
+    "perception": {
+        "inputText": {
+            "text": "天气"
+        },
+        "inputImage": {
+            "url": "imageUrl"
+        },
+        "selfInfo": {
+            "location": {
+                "city": "上海",
+                "province": "上海",
+                "street": "信息路"
+            }
+        }
+    },
+    "userInfo": {
+        "apiKey": "cf5fb4b68b69473d91d447667194f578",
+        "userId": "348368"
+    }
+}
+fetch('http://openapi.tuling123.com/openapi/api/v2', {
+     method: 'POST',
+     headers: {'Content-Type': 'application/json'},
+     mode: 'cors',
+     credentials:'include',
+     body: jsondata
+    }).then( function(response) {
+      if(response.ok) {
+        console.log(response)
+      }
+    }).catch(function(response){
+    })
+
+var json = {"intent":{"actionName":"","code":10008,"intentName":"","parameters":{"date":"","city":"上海"}},"results":[{"groupType":1,"resultType":"text","values":{"text":"上海:周三 11月14日,多云 东北风微风,最低气温13度，最高气温18度"}}]}
+parseJson(json);
+function parseJson(json) {
+speak(json["results"][0]["values"]["text"])
+}
+// speak("初音未来")
+function speak(text) {
+	// var utterThis = new window.SpeechSynthesisUtterance(text);
+	var msg = new SpeechSynthesisUtterance();
+				msg.pitch = 1.5;
+				msg.lang = 'zh-CN';
+				msg.text = text;
+window.speechSynthesis.speak(msg);
+}
+
 		</script>
 	</body>
 </html>
