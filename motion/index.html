@@ -6,8 +6,9 @@
 			body { margin: 0; background-color: #000;}
 		</style>
 		<script src="js/three.min.js"></script>
-		<script src="js/loaders/MMDLoader.js"></script>
 		<script src="js/mmdparser.min.js"></script>
+		<script src="js/jquery-3.3.1.min.js"></script>
+		<script src="js/loaders/MMDLoader.js"></script>
 		<script src="js/animation/MMDAnimationHelper.js"></script>
 		<script src="js/animation/CCDIKSolver.js"></script>
 		<script src="js/animation/MMDPhysics.js"></script>
@@ -329,40 +330,28 @@ recognition.onerror = function(event) {
   console.log('Error occurred in recognition: ' + event.error);
 }
 
-var jsondata = {
-	"reqType":0,
-    "perception": {
-        "inputText": {
-            "text": "天气"
-        },
-        "inputImage": {
-            "url": "imageUrl"
-        },
-        "selfInfo": {
-            "location": {
-                "city": "上海",
-                "province": "上海",
-                "street": "信息路"
-            }
-        }
-    },
-    "userInfo": {
-        "apiKey": "cf5fb4b68b69473d91d447667194f578",
-        "userId": "348368"
-    }
-}
-fetch('http://openapi.tuling123.com/openapi/api/v2', {
-     method: 'POST',
-     headers: {'Content-Type': 'application/json'},
-     mode: 'cors',
-     credentials:'include',
-     body: jsondata
-    }).then( function(response) {
-      if(response.ok) {
-        console.log(response)
-      }
-    }).catch(function(response){
-    })
+var jsondata = { "inputText": "天气" }
+// fetch('http://localhost/talk/talk.php', {
+//      method: 'POST',
+//      // headers: {'Content-Type': 'application/json'},
+//      // mode: 'cors',
+//      // credentials:'include',
+//      body: JSON.stringify(jsondata)
+//     }).then( function(response) {
+//         console.log("response")
+//         console.log(response)
+//       if(response.ok) {
+//       	response.text().then(function(json){
+//         console.log(json)
+//     })
+//       }
+//     }).catch(function(response){
+//     })
+
+    $.post("http://localhost/talk/talk.php", jsondata,function(argument) {
+    console.log(argument);
+    console.log(JSON.parse(argument)["results"][0]["values"]["text"]);
+});
 
 var json = {"intent":{"actionName":"","code":10008,"intentName":"","parameters":{"date":"","city":"上海"}},"results":[{"groupType":1,"resultType":"text","values":{"text":"上海:周三 11月14日,多云 东北风微风,最低气温13度，最高气温18度"}}]}
 parseJson(json);
