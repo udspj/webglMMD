@@ -174,9 +174,9 @@
 			    var vmdFiles = [
 			        {name: 'look', file: 'miku/motion/look.vmd'},
 			        {name: 'sleep', file: 'miku/motion/sleep.vmd'},
+			        {name: 'walk', file: 'miku/motion/walk.vmd'},
 			        {name: 'stand', file: 'miku/motion/stand.vmd'},
-			        {name: 'up', file: 'miku/motion/up.vmd'},
-			        {name: 'walk', file: 'miku/motion/walk.vmd'}
+			        {name: 'up', file: 'miku/motion/up.vmd'}
 			    ];
 
 			    var soundFiles = ["miku/voice/chara1.mp3","miku/voice/chara2.mp3","miku/voice/chara3.mp3","miku/voice/chara4.mp3","miku/voice/chara5.mp3"]
@@ -192,12 +192,17 @@
 				name: '',
 				index: 0
 			};
+			var isOnSpeek = false;
 			function manageAnimation(delta){
+				var gotomotion = 2;
+				if(isOnSpeek) {
+					gotomotion=3;
+				}
 		        // if(motionindex !== 2) {
 					motionStatus.elapsedTime += delta;
 					// console.log(motionStatus.elapsedTime+","+motionStatus.duration)
 					if ( motionStatus.elapsedTime+delta >= motionStatus.duration-delta ) {
-						changeMotion(2)
+						changeMotion(gotomotion)
 					}
 				// }
 			}
@@ -215,28 +220,28 @@
 				helper.objects.get( mesh ).mixer.clipAction( motionlist[motionindex] ).stop();
 				helper.objects.get( mesh ).mixer.clipAction( motionlist[index] ).play();
 				motionindex = index;
-				console.log(currentaudio)
-				if(currentaudio !== undefined){
-				console.log("undefined")
-					helper.remove(currentaudio)
-					scene.remove(currentaudio)
-					currentaudio=undefined;
-				}
+				// console.log(currentaudio)
+				// if(currentaudio !== undefined){
+				// console.log("undefined")
+				// 	helper.remove(currentaudio)
+				// 	scene.remove(currentaudio)
+				// 	currentaudio=undefined;
+				// }
 
 				motionStatus.elapsedTime=0.0
 				// audio.pause()
 				console.log("motiondurationlist:"+motiondurationlist)
-				if(index !== 2) {
-					console.log("index:"+index)
-					var audio = new THREE.Audio( listener ).setBuffer( voicelist[index] );
-					audio.setLoop( false );
-					helper.add( audio );
-					// if(currentaudio !== undefined){
-					scene.add( audio );
-					// }
-					currentaudio=audio;
-					// audio.play()
-				}
+				// if(index !== 2) {
+				// 	console.log("index:"+index)
+				// 	var audio = new THREE.Audio( listener ).setBuffer( voicelist[index] );
+				// 	audio.setLoop( false );
+				// 	helper.add( audio );
+				// 	// if(currentaudio !== undefined){
+				// 	scene.add( audio );
+				// 	// }
+				// 	currentaudio=audio;
+				// 	// audio.play()
+				// }
 
 				const duration = motiondurationlist[index];//helper.objects.get( mesh ).mixer.clipAction( motionlist[index] )._clip.duration;
 				console.log("duration:"+duration)
@@ -282,57 +287,41 @@
 
 
 
-var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition
-var SpeechGrammarList = SpeechGrammarList || webkitSpeechGrammarList
-var SpeechRecognitionEvent = SpeechRecognitionEvent || webkitSpeechRecognitionEvent
+			var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition
+			var SpeechGrammarList = SpeechGrammarList || webkitSpeechGrammarList
+			var SpeechRecognitionEvent = SpeechRecognitionEvent || webkitSpeechRecognitionEvent
 
 			var recognition = new SpeechRecognition();
-var speechRecognitionList = new SpeechGrammarList();
-// speechRecognitionList.addFromString(grammar, 1);
-recognition.grammars = speechRecognitionList;
-//recognition.continuous = false;
-recognition.lang = 'zh-CN';
-recognition.interimResults = false;
-recognition.maxAlternatives = 1;
+			var speechRecognitionList = new SpeechGrammarList();
+			recognition.grammars = speechRecognitionList;
+			recognition.lang = 'zh-CN';
+			recognition.interimResults = false;
+			recognition.maxAlternatives = 1;
 
-document.body.onclick = function() {
-  recognition.start();
-  console.log('Ready to receive a color command.');
-}
+			document.body.onclick = function() {
+			  recognition.start();
+			}
 
-recognition.onresult = function(event) {
-  // The SpeechRecognitionEvent results property returns a SpeechRecognitionResultList object
-  // The SpeechRecognitionResultList object contains SpeechRecognitionResult objects.
-  // It has a getter so it can be accessed like an array
-  // The [last] returns the SpeechRecognitionResult at the last position.
-  // Each SpeechRecognitionResult object contains SpeechRecognitionAlternative objects that contain individual results.
-  // These also have getters so they can be accessed like arrays.
-  // The [0] returns the SpeechRecognitionAlternative at position 0.
-  // We then return the transcript property of the SpeechRecognitionAlternative object
+			recognition.onresult = function(event) {
+			var last = event.results.length - 1;
+			var color = event.results[last][0].transcript;
+			var jsondata = { "inputText": color }
+				$.post("http://localhost/talk/talk.php", jsondata,function(argument) {
+				    speak(JSON.parse(argument)["results"][0]["values"]["text"]);
+				});
+			}
 
-  var last = event.results.length - 1;
-  var color = event.results[last][0].transcript;
-console.log(color)
-var jsondata = { "inputText": color }
-$.post("http://localhost/talk/talk.php", jsondata,function(argument) {
-    speak(JSON.parse(argument)["results"][0]["values"]["text"]);
-});
-  // diagnostic.textContent = 'Result received: ' + color + '.';
-  // bg.style.backgroundColor = color;
-  console.log('Confidence: ' + event.results[0][0].confidence);
-}
+			recognition.onspeechend = function() {
+			  recognition.stop();
+			}
 
-recognition.onspeechend = function() {
-  recognition.stop();
-}
+			recognition.onnomatch = function(event) {
+			  // console.log("I didn't recognise that color.");
+			}
 
-recognition.onnomatch = function(event) {
-  console.log("I didn't recognise that color.");
-}
-
-recognition.onerror = function(event) {
-  console.log('Error occurred in recognition: ' + event.error);
-}
+			recognition.onerror = function(event) {
+			  console.log('Error: ' + event.error);
+			}
 
 // var jsondata = { "inputText": "天气" }
 // fetch('http://localhost/talk/talk.php', {
@@ -352,22 +341,23 @@ recognition.onerror = function(event) {
 //     }).catch(function(response){
 //     })
 
-    
-
-// var json = {"intent":{"actionName":"","code":10008,"intentName":"","parameters":{"date":"","city":"上海"}},"results":[{"groupType":1,"resultType":"text","values":{"text":"上海:周三 11月14日,多云 东北风微风,最低气温13度，最高气温18度"}}]}
-// parseJson(json);
-// function parseJson(json) {
-// speak(json["results"][0]["values"]["text"])
-// }
-// speak("初音未来")
-function speak(text) {
-	// var utterThis = new window.SpeechSynthesisUtterance(text);
-	var msg = new SpeechSynthesisUtterance();
+			function speak(text) {
+				// var utterThis = new window.SpeechSynthesisUtterance(text);
+				var msg = new SpeechSynthesisUtterance();
 				msg.pitch = 1.5;
 				msg.lang = 'zh-CN';
 				msg.text = text;
-window.speechSynthesis.speak(msg);
-}
+				window.speechSynthesis.speak(msg);
+				msg.onstart = function(event) {
+					isOnSpeek = true;
+					changeMotion(3)
+				  console.log('onstart: ' + event.error);
+				}
+				msg.onend = function(event) {
+					isOnSpeek = false;
+				  console.log('onend: ' + event.error);
+				}
+			}
 
 		</script>
 	</body>
