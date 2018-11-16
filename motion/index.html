@@ -300,23 +300,26 @@
 
 			document.body.onclick = function() {
 			  recognition.start();
+			  console.log("recognition.start()");
 			}
 
 			recognition.onresult = function(event) {
-			var last = event.results.length - 1;
-			var color = event.results[last][0].transcript;
-			var jsondata = { "inputText": color }
+				var last = event.results.length - 1;
+				var color = event.results[last][0].transcript;
+				var jsondata = { "inputText": color }
 				$.post("http://localhost/talk/talk.php", jsondata,function(argument) {
 				    speak(JSON.parse(argument)["results"][0]["values"]["text"]);
 				});
+			  console.log("onresult");
 			}
 
 			recognition.onspeechend = function() {
+			  console.log("onspeechend");
 			  recognition.stop();
 			}
 
 			recognition.onnomatch = function(event) {
-			  // console.log("I didn't recognise that color.");
+			  console.log("I didn't recognise that color.");
 			}
 
 			recognition.onerror = function(event) {
